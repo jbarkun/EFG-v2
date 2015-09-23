@@ -32,35 +32,35 @@ if (!$error_code == 0)
     switch ($error_code)
     {
         case 1:
-            echo 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+            die('The uploaded file exceeds the upload_max_filesize directive in php.ini');
             break;
 
         case 2:
-            echo 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
+            die('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
             break;
 
         case 3:
-            echo 'The uploaded file was only partially uploaded';
+            die('The uploaded file was only partially uploaded');
             break;
 
         case 4:
-            echo 'No file was uploaded';
+            die('No file was uploaded');
             break;
 
         case 6:
-            echo 'Missing a temporary folder';
+            die('Missing a temporary folder');
             break;
 
         case 7:
-            echo 'Failed to write file to disk';
+            die('Failed to write file to disk');
             break;
 
         case 8:
-            echo 'A PHP extension stopped the file upload';
+            die('A PHP extension stopped the file upload');
             break;
 
         default:
-            echo 'Unknown upload error';
+            die('Unknown upload error');
             break;
     }
 }
@@ -70,8 +70,7 @@ if (!$error_code == 0)
  */
 elseif (!in_array($file_type, $acceptable_file_type))
 {
-    echo 'Please only upload jpeg, png, or gif images';
-    exit;
+    die('Please only upload jpeg, png, or gif images');
 }
 
 
@@ -79,8 +78,7 @@ elseif (!in_array($file_type, $acceptable_file_type))
  *  Check if the file size is over 100KB
  */
 elseif ($_FILES['file']['size'] > 100000){
-    echo 'File size is too big';
-    exit;
+    die('File size is too big');
 }
 
 else
@@ -92,20 +90,18 @@ else
     $image_property = getimagesize($_FILES['file']['tmp_name']);
     if ($image_property[0] != $image_property[1])
     {
-        echo 'Please only use square images.';
-        exit;
+        die('Please only use square images.');
     }
 
     elseif ($image_property[0] < 60 || $image_property[1] < 60)
     {
-        echo 'Please use images that are at least 60px by 60px';
-        exit;
+        die('Please use images that are at least 60px by 60px');
     }
 
     $uploaded_file = 'img/logo/' . basename($_FILES['file']['name']);
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploaded_file))
     {
-
-        echo $uploaded_file;
+        $fileUrl =  'http://' . $_SERVER['HTTP_HOST']. dirname($_SERVER['REQUEST_URI']) . '/' . $uploaded_file;
+        echo $fileUrl;
     }
 }

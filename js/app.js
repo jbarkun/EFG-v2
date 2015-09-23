@@ -40,18 +40,28 @@
 
     app.controller("uploadController", ['$rootScope', 'Upload', function($rootScope, Upload){
         $rootScope.upload = function (file) {
-            Upload.upload({
-                url: 'upload.php',
-                file: file
-            }).progress(function (evt) {
-                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
-            }).success(function (data, status, headers, config) {
-                console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
-                $rootScope.logoUrl = data;
-            }).error(function (data, status, headers, config) {
-                console.log('error status: ' + status);
-            })
+            delete $rootScope.uploadProgress;
+            if (!file.$error){
+                delete $rootScope.uploadError;
+                Upload.upload({
+                    url: 'upload.php',
+                    file: file
+                }).progress(function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    $rootScope.uploadProgress = progressPercentage;
+                    console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
+                }).success(function (data, status, headers, config) {
+                    console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
+                    if (data.substring(0, 4) == 'http'){
+                        $rootScope.logoUrl = data;
+                    }
+                }).error(function (data, status, headers, config) {
+                    console.log('error status: ' + status);
+                })
+            }
+            else {
+                $rootScope.uploadError = file.$error;
+            }
         };
     }]);
 })();

@@ -1,12 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-</head>
-<body>
 <pre>
-<? print_r($_POST) ?>
+    <? print_r($_SERVER) ?>
 </pre>
-</body>
-</html>
