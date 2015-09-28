@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="test">
+<html lang="en" ng-app="efg">
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.min.js"></script>
@@ -7,66 +7,120 @@
     <script src='bower_components/angular-mask/dist/ngMask.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/7.3.6/ng-file-upload-all.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCHNh5hOtaR0y5tgJg3fAXRz4fOWvGUxos"></script>
+    <script src="js/ngAutocomplete.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/index.css">
     <title>Email Footer Generator (Multiple)</title>
 </head>
 <body>
+
 <div ng-controller="uploadController as uc">
+    <h4>Upload your company's logo here</h4>
+
     <div ngf-drop="upload($file)" class="drop-box"
          ngf-select="upload($file)"
          ngf-drag-over-class="dragover" ngf-multiple="false"
-         ngf-pattern="'image/*'" ngf-max-size="100KB" ngf-ratio="1x1" ng-model="file">Drop or click to select your logo here</div>
+         ngf-pattern="'image/*'" ngf-max-size="100KB" ngf-ratio="1x1" ng-model="file">Drop or click to select your logo
+        here
+    </div>
     <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
+
+    <!--This line is for image preview-->
     <!--<img ngf-src="file">-->
+
     <span ng-if="uploadError">{{uploadError}}</span>
     <span ng-if="uploadProgress">Upload Progress: {{uploadProgress}}%</span>
 </div>
 
-<div ng-controller="testController as tc">
-    <form action="results.php" method="post">
+<div ng-controller="footerController as fc">
+
+    <h3>Company Info</h3>
+    <input type="url" placeholder="Website Url" ng-model="companyUrl"/>
+    <input type="text" ng-autocomplete ng-model="autocomplete" options="options" details="details"
+           placeholder="Company Address"/>
+    <fieldset>
+        <legend>Social Media</legend>
+
+        <label for="companyFacebookCheckbox">Facebook</label>
+        <input type="checkbox" ng-model="companyFacebookCheckbox" id="companyFacebookCheckbox">
+        <input type="url" ng-show="companyFacebookCheckbox" ng-model="companyFacebookUrl"
+               placeholder="Company Facebook Page URL">
+
+        <label for="companyLinkedInCheckbox">LinkedIn</label>
+        <input type="checkbox" ng-model="companyLinkedInCheckbox" id="companyLinkedInCheckbox"/>
+        <input type="url" ng-show="companyLinkedInCheckbox" ng-model="companyLinkedInUrl"
+               placeholder="Company LinkedIn Page URL">
+
+    </fieldset>
+    <h3>Employee Info</h3>
+
+    <form action="results.php" method="post" id="footers">
         <tabset>
-            <tab heading="Add New Employee" ng-click="tc.addNum()" ng-show="tc.allowAddNew"></tab>
+            <tab heading="Add New Employee" ng-click="fc.addNum()" ng-show="fc.allowAddNew"></tab>
             <tab ng-repeat="n in numArray" heading="{{$index+1}}" active="true">
                 <div ng-form="personForm">
-                    <input type="text" ng-model="person.fname" placeholder="First Name" name="fname{{$index+1}}">
-                    <input type="text" ng-model="person.lname" placeholder="Last Name" name="lname{{$index+1}}">
-                    <input type="text" ng-model="person.title" placeholder="Title" name="title{{$index+1}}">
-                    <input type="email" ng-model="person.email" placeholder="Email Address" name="email{{$index+1}}">
-                    <input type="tel" ng-model="person.phone" placeholder="Phone Number" name="phone{{$index+1}}" mask='(999) 999-9999' restrict="reject">
-                    <button type="button" ng-click="tc.remove(n)" ng-show="tc.allowRemove">X</button>
+                    <input type="text" ng-model="person.fname" placeholder="First Name">
+                    <input type="text" ng-model="person.lname" placeholder="Last Name">
+                    <input type="text" ng-model="person.title" placeholder="Title">
+                    <input type="email" ng-model="person.email" placeholder="Email Address">
+                    <input type="tel" ng-model="person.phone" placeholder="Phone Number" mask='(999) 999-9999' restrict="reject">
+                    <button type="button" ng-click="fc.remove(n)" ng-show="fc.allowRemove">X</button>
                     <button type="button" ng-click="person = null; personForm.$setPristine();">Reset</button>
                 </div>
-                <table style="margin-top:40px;margin-left:20px;margin-bottom:30px;width:95%" border="0">
-                    <tr height="60">
-                        <td width="60">
-                            <img ng-if="logoUrl" ng-src="{{logoUrl}}" alt="Ankit Designs Logo" width="60" height="60"/>
-                        </td>
-                        <td>
-                <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height:20px;"><b style="color:#d40404;text-transform:uppercase;letter-spacing:2px">{{person.fname}}
-                    &nbsp;{{person.lname}}</b> <span ng-if="person.title.length">/</span> {{person.title}}</span><br/>
-            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2;"><b style="color:#888888">e:</b>&nbsp;&nbsp;<a ng-href="mailto:{{person.email}}" title="email {{person.fname}}" style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.email}}</a>&nbsp;&nbsp;<b style="color:#888888">t:</b>&nbsp;&nbsp;<a href="tel:{{person.phone}}" style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.phone}}</a></span>
-                            <br/>
-                <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b style="color:#888888">a:</b>&nbsp;&nbsp;<a href="https://goo.gl/maps/6tp9j" title="View On Google Maps" style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">2355 Derry Road East, Unit 38, Mississauga, ON L5S 1V6{{address}}</a></span> <br/>
-                <span
-                        style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b
-                        style="color:#888888">w:</b>&nbsp;&nbsp;<a href="http://www.ankitdesigns.com"
-                                                                   title="Visit Ankit Designs Website"
-                                                                   style="text-decoration:none; border-bottom:1px dotted #888888;color:#b2b2b2">www.ankitdesigns.com</a></span><br/>
-            <span
-                    style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height: 40px;"><a
-                    href="http://www.facebook.com/viewankitdesigns" title="Like On Facebook"><img
-                    src="http://www.ankitdesigns.com/email_sig/images/fb.jpg"/></a>&nbsp;&nbsp;<a
-                    href="http://www.linkedin.com/company/ankit-designs" title="Connect On Linked In"><img
-                    src="http://www.ankitdesigns.com/email_sig/images/li.jpg"/></a></span>
-                        </td>
-                    </tr>
-                </table>
+                <div id="footer{{$index+1}}">
+                    <table
+                            style="margin-top:40px;margin-left:20px;margin-bottom:30px;width:95%" border="0">
+                        <tr height="60">
+                            <td width="60">
+                                <img ng-if="logoUrl"
+                                     ng-src="{{logoUrl}}"
+                                     alt="Ankit Designs Logo"
+                                     width="60" height="60"/>
+                            </td>
+                            <td>
+                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height:20px;"><b
+                                    style="color:#d40404;text-transform:uppercase;letter-spacing:2px">{{person.fname}}&nbsp;{{person.lname}}</b><span
+                                    ng-if="person.title.length">/</span> {{person.title}}</span>
+                                <br/>
+            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2;">
+                <b style="color:#888888">e:</b>&nbsp;&nbsp;<a ng-href="mailto:{{person.email}}"
+                                                              title="email {{person.fname}}"
+                                                              style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.email}}</a>&nbsp;&nbsp;<b
+                    style="color:#888888">t:</b>&nbsp;&nbsp;<a href="tel:{{person.phone}}"
+                                                               style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.phone}}</a></span>
+                                <br/>
+                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b
+                                    style="color:#888888">a:</b>&nbsp;&nbsp;<a
+                                    href="https://maps.google.com?q={{autocomplete}}" title="View On Google Maps"
+                                    style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2"><span
+                                    ng-if="details.formatted_address">{{details.formatted_address}}</span></a></span>
+                                <br/>
+                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b
+                                    style="color:#888888">w:</b>&nbsp;&nbsp;<a href="{{companyUrl}}"
+                                                                               title="Visit Our Website"
+                                                                               style="text-decoration:none; border-bottom:1px dotted #888888;color:#b2b2b2">{{companyUrl}}</a></span><br/>
+            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height: 40px;"><a
+                    ng-if="companyFacebookCheckbox"
+                    href="{{companyFacebookUrl}}" title="Like On Facebook">
+                <img
+                        src="http://www.ankitdesigns.com/email_sig/images/fb.jpg"/></a>
+                &nbsp;&nbsp;<a ng-if="companyLinkedInCheckbox"
+                               href="{{companyLinkedInUrl}}" title="Connect On Linked In">
+                    <img
+                            src="http://www.ankitdesigns.com/email_sig/images/li.jpg"/></a></span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <input type="hidden" name="footer{{$index + 1}}" value="" id="footerCode{{$index+1}}">
             </tab>
         </tabset>
-        <input type="submit" value="Generate">
+        <button type="button" ng-click="copyFooters()" ng-if="!zipFile">Generate</button>
     </form>
+    <a ng-if="zipFile" href="{{zipFile}}" download>Your footers are ready to download</a>
 </div>
 </body>
 </html>

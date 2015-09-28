@@ -1,7 +1,7 @@
 (function () {
-    var app = angular.module('test', ['ngMask', 'ui.bootstrap', 'ngFileUpload']);
+    var app = angular.module('efg', ['ngMask', 'ui.bootstrap', 'ngFileUpload', 'ngAutocomplete']);
 
-    app.controller("testController", ['$scope', function ($scope) {
+    app.controller("footerController", ['$scope', '$rootScope', '$http', function ($scope, $rootScope, $http) {
 
         $scope.num = 1;
         $scope.numArray = [1];
@@ -34,7 +34,22 @@
             if ($scope.numArray.length <= 1) {
                 this.allowRemove = false;
             }
+        };
 
+        $scope.copyFooters = function(){
+            var footerArray = [];
+
+            for (var num in $scope.numArray){
+                var index = parseInt(num) + 1;
+                //$('#footerCode' + index).val(($('#footer' + index).html()));
+                var footerCode = $.trim($('#footer' + index).html());
+                footerArray.push(footerCode);
+            }
+
+            var footerArrayToJson = angular.toJson(footerArray);
+            $http.post('results.php', footerArrayToJson).then(function(response){
+                $scope.zipFile = response.data;
+            });
         };
     }]);
 
