@@ -31,4 +31,8 @@ foreach ($path_array as $path){
 
 $zip->close();
 
+foreach ($path_array as $path){
+    unlink($path);
+}
+
 echo $file_name;

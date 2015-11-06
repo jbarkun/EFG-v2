@@ -16,15 +16,18 @@
     <title>Email Footer Generator (Multiple)</title>
 </head>
 <body>
+<style>
 
-<div ng-controller="uploadController as uc">
+</style>
+<div ng-controller="UploadController as uc" ng-if="!zipFile">
+
     <h4>Upload your company's logo here</h4>
 
     <div ngf-drop="upload($file)" class="drop-box"
          ngf-select="upload($file)"
          ngf-drag-over-class="dragover" ngf-multiple="false"
-         ngf-pattern="'image/*'" ngf-max-size="100KB" ngf-ratio="1x1" ng-model="file">Drop or click to select your logo
-        here
+         ngf-pattern="'image/*'" ngf-max-size="100KB" ngf-ratio="1x1" ng-model="file">
+        Drop or click to select your logo here
     </div>
     <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
 
@@ -35,92 +38,79 @@
     <span ng-if="uploadProgress">Upload Progress: {{uploadProgress}}%</span>
 </div>
 
-<div ng-controller="footerController as fc">
+<div ng-controller="FooterController as fc" ng-if="!zipFile">
 
-    <h3>Company Info</h3>
-    <input type="url" placeholder="Website Url" ng-model="companyUrl"/>
-    <input type="text" ng-autocomplete ng-model="autocomplete" options="options" details="details"
-           placeholder="Company Address"/>
-    <fieldset>
-        <legend>Social Media</legend>
+    <form ng-submit="copyFooters()" name="myForm" novalidate>
+        <h3>Company Info</h3>
+        <input type="url" placeholder="Website Url" ng-model="companyUrl" required/>
+        <input type="text" ng-autocomplete ng-model="autocomplete" options="options" details="details"
+               placeholder="Company Address" required/>
+        <fieldset>
+            <legend>Social Media</legend>
 
-        <label for="companyFacebookCheckbox">Facebook</label>
-        <input type="checkbox" ng-model="companyFacebookCheckbox" id="companyFacebookCheckbox">
-        <input type="url" ng-show="companyFacebookCheckbox" ng-model="companyFacebookUrl"
-               placeholder="Company Facebook Page URL">
+            <label for="companyFacebookCheckbox">Facebook</label>
+            <input type="checkbox" ng-model="companyFacebookCheckbox" id="companyFacebookCheckbox">
+            <input type="url" ng-show="companyFacebookCheckbox" ng-model="companyFacebookUrl"
+                   placeholder="Company Facebook Page URL">
 
-        <label for="companyLinkedInCheckbox">LinkedIn</label>
-        <input type="checkbox" ng-model="companyLinkedInCheckbox" id="companyLinkedInCheckbox"/>
-        <input type="url" ng-show="companyLinkedInCheckbox" ng-model="companyLinkedInUrl"
-               placeholder="Company LinkedIn Page URL">
+            <label for="companyLinkedInCheckbox">LinkedIn</label>
+            <input type="checkbox" ng-model="companyLinkedInCheckbox" id="companyLinkedInCheckbox"/>
+            <input type="url" ng-show="companyLinkedInCheckbox" ng-model="companyLinkedInUrl"
+                   placeholder="Company LinkedIn Page URL">
 
-    </fieldset>
-    <h3>Employee Info</h3>
+        </fieldset>
 
-    <form action="results.php" method="post" id="footers">
+        <h3>Employee Info</h3>
+
         <tabset>
             <tab heading="Add New Employee" ng-click="fc.addNum()" ng-show="fc.allowAddNew"></tab>
-            <tab ng-repeat="n in numArray" heading="{{$index+1}}" active="true">
+            <tab ng-repeat="n in numArray" heading="{{$index+1}}" active="true" ng-class="">
                 <div ng-form="personForm">
-                    <input type="text" ng-model="person.fname" placeholder="First Name">
-                    <input type="text" ng-model="person.lname" placeholder="Last Name">
-                    <input type="text" ng-model="person.title" placeholder="Title">
-                    <input type="email" ng-model="person.email" placeholder="Email Address">
-                    <input type="tel" ng-model="person.phone" placeholder="Phone Number" mask='(999) 999-9999' restrict="reject">
+                    <input type="text" ng-model="person.fname" placeholder="First Name" name="fname_{{$index+1}}" required>
+                    <input type="text" ng-model="person.lname" placeholder="Last Name" required>
+                    <input type="text" ng-model="person.title" placeholder="Title" required>
+                    <input type="email" ng-model="person.email" placeholder="Email Address" required>
+                    <input type="tel" ng-model="person.phone" placeholder="Phone Number" mask='(999) 999-9999'
+                           restrict="reject" required>
                     <button type="button" ng-click="fc.remove(n)" ng-show="fc.allowRemove">X</button>
                     <button type="button" ng-click="person = null; personForm.$setPristine();">Reset</button>
                 </div>
                 <div id="footer{{$index+1}}">
-                    <table
-                            style="margin-top:40px;margin-left:20px;margin-bottom:30px;width:95%" border="0">
+                    <table style="margin-top:40px;margin-left:20px;margin-bottom:30px;width:95%" border="0">
                         <tr height="60">
                             <td width="60">
-                                <img ng-if="logoUrl"
-                                     ng-src="{{logoUrl}}"
-                                     alt="Ankit Designs Logo"
-                                     width="60" height="60"/>
+                                <img ng-if="logoUrl" ng-src="{{logoUrl}}" alt="Ankit Designs Logo" width="60" height="60"/>
                             </td>
                             <td>
-                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height:20px;"><b
-                                    style="color:#d40404;text-transform:uppercase;letter-spacing:2px">{{person.fname}}&nbsp;{{person.lname}}</b><span
-                                    ng-if="person.title.length">/</span> {{person.title}}</span>
+                                <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888;line-height:20px"><b style="color:#d40404;text-transform:uppercase;letter-spacing:2px">{{person.fname}}&nbsp;{{person.lname}}</b><span ng-if="person.title.length">/</span> {{person.title}}</span>
                                 <br/>
-            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2;">
-                <b style="color:#888888">e:</b>&nbsp;&nbsp;<a ng-href="mailto:{{person.email}}"
-                                                              title="email {{person.fname}}"
-                                                              style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.email}}</a>&nbsp;&nbsp;<b
-                    style="color:#888888">t:</b>&nbsp;&nbsp;<a href="tel:{{person.phone}}"
-                                                               style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.phone}}</a></span>
+<span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2">
+<b style="color:#888888">e:</b>&nbsp;&nbsp;<a ng-href="mailto:{{person.email}}" title="email {{person.fname}}" style="text-decoration:none;border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.email}}</a>&nbsp;&nbsp;<b style="color:#888888">t:</b>&nbsp;&nbsp;<a href="tel:{{person.phone}}" style="text-decoration:none;border-bottom:1px dotted #b2b2b2;color:#b2b2b2">{{person.phone}}</a></span>
                                 <br/>
-                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b
-                                    style="color:#888888">a:</b>&nbsp;&nbsp;<a
-                                    href="https://maps.google.com?q={{autocomplete}}" title="View On Google Maps"
-                                    style="text-decoration:none; border-bottom:1px dotted #b2b2b2;color:#b2b2b2"><span
-                                    ng-if="details.formatted_address">{{details.formatted_address}}</span></a></span>
+                                <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2;text-decoration:none"><b style="color:#888888">a:</b>&nbsp;&nbsp;<a href="https://maps.google.com?q={{autocomplete}}" title="View On Google Maps" style="text-decoration:none;border-bottom:1px dotted #b2b2b2;color:#b2b2b2"><span ng-if="details.formatted_address">{{details.formatted_address}}</span></a></span>
                                 <br/>
-                            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2; text-decoration:none;"><b
-                                    style="color:#888888">w:</b>&nbsp;&nbsp;<a href="{{companyUrl}}"
-                                                                               title="Visit Our Website"
-                                                                               style="text-decoration:none; border-bottom:1px dotted #888888;color:#b2b2b2">{{companyUrl}}</a></span><br/>
-            <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888888;line-height: 40px;"><a
-                    ng-if="companyFacebookCheckbox"
-                    href="{{companyFacebookUrl}}" title="Like On Facebook">
-                <img
-                        src="http://www.ankitdesigns.com/email_sig/images/fb.jpg"/></a>
-                &nbsp;&nbsp;<a ng-if="companyLinkedInCheckbox"
-                               href="{{companyLinkedInUrl}}" title="Connect On Linked In">
-                    <img
-                            src="http://www.ankitdesigns.com/email_sig/images/li.jpg"/></a></span>
+                                <span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#b2b2b2;text-decoration:none"><b style="color:#888888">w:</b>&nbsp;&nbsp;<a href="{{companyUrl}}" title="Visit Our Website" style="text-decoration:none;border-bottom:1px dotted #888;color:#b2b2b2">{{companyUrl}}</a></span><br/>
+<span style="font-family:'Trebuchet MS',helvetica,San-Serif;font-size:11px;color:#888;line-height:40px"><a ng-if="companyFacebookCheckbox" href="{{companyFacebookUrl}}" title="Like On Facebook">
+    <img src="http://www.ankitdesigns.com/email_sig/images/fb.jpg"/></a>
+&nbsp;&nbsp;<a ng-if="companyLinkedInCheckbox" href="{{companyLinkedInUrl}}" title="Connect On Linked In">
+        <img src="http://www.ankitdesigns.com/email_sig/images/li.jpg"/></a></span>
                             </td>
                         </tr>
                     </table>
                 </div>
                 <input type="hidden" name="footer{{$index + 1}}" value="" id="footerCode{{$index+1}}">
+                <div><p>The completeness of this employee's info is {{personForm.$valid}}</p></div>
             </tab>
         </tabset>
-        <button type="button" ng-click="copyFooters()" ng-if="!zipFile">Generate</button>
+        <!--<button type="button" ng-click="copyFooters()" >Generate</button>-->
+        <input type="submit" ng-disabled="myForm.$invalid" value="Generate">
     </form>
-    <a ng-if="zipFile" href="{{zipFile}}" download>Your footers are ready to download</a>
+    <div><p>The validity of the form is {{myForm.$valid}}</p></div>
 </div>
+
+<!--<div ng-controller="ResultController as rc" ng-if="zipFile">-->
+<!--</div>-->
+
+<a ng-if="zipFile" href="{{zipFile}}" download>Your footers are ready to download</a>
 </body>
 </html>

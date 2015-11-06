@@ -1,7 +1,7 @@
 (function () {
     var app = angular.module('efg', ['ngMask', 'ui.bootstrap', 'ngFileUpload', 'ngAutocomplete']);
 
-    app.controller("footerController", ['$scope', '$rootScope', '$http', function ($scope, $rootScope, $http) {
+    app.controller("FooterController", ['$scope', '$rootScope', '$http', function ($scope, $rootScope, $http) {
 
         $scope.num = 1;
         $scope.numArray = [1];
@@ -41,19 +41,18 @@
 
             for (var num in $scope.numArray){
                 var index = parseInt(num) + 1;
-                //$('#footerCode' + index).val(($('#footer' + index).html()));
                 var footerCode = $.trim($('#footer' + index).html());
                 footerArray.push(footerCode);
             }
 
             var footerArrayToJson = angular.toJson(footerArray);
             $http.post('results.php', footerArrayToJson).then(function(response){
-                $scope.zipFile = response.data;
+                $rootScope.zipFile = response.data;
             });
         };
     }]);
 
-    app.controller("uploadController", ['$rootScope', 'Upload', function($rootScope, Upload){
+    app.controller("UploadController", ['$rootScope', 'Upload', function($rootScope, Upload){
         $rootScope.upload = function (file) {
             delete $rootScope.uploadProgress;
             if (!file.$error){
@@ -79,4 +78,8 @@
             }
         };
     }]);
+
+    app.controller("ResultController", ['$rootScope', function($rootScope){
+
+    }])
 })();
